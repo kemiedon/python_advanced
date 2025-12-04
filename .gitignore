@@ -1,0 +1,13 @@
+# Python 進階課程
+
+*.pyc
+__pycache__/
+*.db
+*.json
+!SPEC/*.json
+*.csv
+test_*/
+.DS_Store
+.vscode/
+.idea/
+*.log
