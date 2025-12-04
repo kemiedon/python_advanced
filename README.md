@@ -124,7 +124,7 @@ python unit07_sql_database/example01_basic_sqlite.py
 
 ## 👨‍💻 作者
 
-資展國際 Python 進階課程教材
+廣瞻互動媒體設計 林靜君(Kemie)老師
 
 ## 📅 更新日期
 
