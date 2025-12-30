@@ -2,133 +2,28 @@
 
 ## 單元 1：物件導向基礎（OOP）
 
-### 生活化範例
+### 什麼是物件導向?
 
-以下用更口語的方式說明，方便上課講解或當教材筆記：
+物件導向就是「把程式當成一堆會互動的東西（物件）組合起來」，而不是只是一連串從上到下跑的指令。
 
-- 閉包（Closure）怎麼想：
+### 為什麼要用物件導向?
 
-  - 想像有一本專屬的小筆記本，只屬於某一個函式。每次那個函式做事，就把資料寫進筆記本，筆記本會一直記得這些資料。即使原來那個寫筆記的程式不再執行，筆記本（閉包）會保存狀態。實務上常用來做「計數器」或「保存私人狀態」的工具。
+* 把複雜的程式拆成一個一個物件，較容易分工、維護和擴充，例如遊戲裡有「玩家」、「怪物」、「道具」等物件，各自負責自己的事情。
+* 修改時通常只改其中一個類別，不用把整支程式翻來翻去，所以程式更好讀、比較不容易改壞其他地方。
 
-- 裝飾器（Decorator）怎麼想：
+### 類別和物件：動物種類 vs. 個別動物
 
-  - 裝飾器就像在原本功能外面包一層附加程序，像門禁系統先檢查身份、或是幫函式加日誌、計時。你不需要改原來的函式，直接把裝飾器套上去就能在執行前後加事情。
+類別（Class）像「動物種類」。
+例如: Animal（動物）、Dog（狗）、Cat（貓），類別裡會定義這一類動物的「特徵」和「會做的事」。
+物件（Object）就是一隻一隻真正的動物。
+例如:「小黑這隻狗」、「小花這隻貓」，它們都是從 Dog 或 Cat 這個類別生出來，各自有自己的名字、年齡、體重。
 
-上課示範建議：
+### 屬性和方法：長相 vs. 行為
 
-- 閉包示範：
-
-  - 實作一個簡單的計數器工廠（每個學生建立自己的 counter），讓學生各自呼叫自己的 counter，觀察數字各自遞增、互不干擾。
-  - 實作 `@require_login` 模擬門禁：未登入的呼叫會被拒絕，已登入的才執行原本功能。
-  - 再示範 `@timeit`，讓學生比較不同函式被裝飾前後的執行時間輸出，說明裝飾器可用來做性能監控。
-
-而是「有一個桌子模板（Class）」，
-你家有一張 IKEA 的桌子、朋友家也有一張，但都是那個模板做的（Object）。
-
-Python 也一樣：
-
-#### 物件導向的三個元素
-
-| ---------------- | ---------------------------------------------- | ----------------------- |
-| 物件（Object） | 具體存在、可操作的程式實體 | 通常指由類別產生的實例 |
-| 類別（Class） | 定義一群物件的屬性與行為藍圖 | class 類別名稱: |
-| 實例（Instance） | 根據類別建立的具體物件，每個實例可有不同屬性值 | 實例 = 類別名稱(參數) |
-
-### 生活化範例
-
-以下用簡單、口語的方式說明，並附上重點與範例，可直接在課堂演示。
-
-專屬筆記本（閉包的比喻）
-
-- 想像每位學生有一本只屬於他的筆記本，老師（外層函式）把筆記本交給學生後就離開，但筆記本會一直記下學生做過的事。無論過了多久，學生翻開筆記本，裡面的記錄都還在——這就是閉包的概念。
-
-範例：
-
-```python
-def make_counter(name):
-   count = 0  # 外層變數
-   def add_one():
-      nonlocal count
-      count += 1
-      print(f"{name} 的計數：{count}")
-   return add_one
-
-# 每位學生有自己的計數器
-小明計數 = make_counter("小明")
-小美計數 = make_counter("小美")
-
-小明計數()  # 小明 的計數：1
-小明計數()  # 小明 的計數：2
-小美計數()  # 小美 的計數：1
-小美計數()  # 小美 的計數：2
-
-# 注意：小明的計數和小美的計數互不干擾！
-```
-
-重點：
-
-- 每個閉包都有自己的「私人變數」，互不影響。
-- 閉包常用於計數器、狀態儲存、以及工廠函式（返回特定行為的函式）。
-
-門禁系統（裝飾器的比喻）
-
-- 想像你來公司上班，門禁系統會先檢查你的識別證（前置動作），確認你有權限才放你進去做工作（真正的功能）。下班時，門禁系統記錄你離開的時間（後置動作）。門禁系統沒改變你「工作」這件事本身，只是在前後加了檢查與記錄，這就是裝飾器的用途。
-
-範例 1：簡單的裝飾器（記錄執行時間）
-
-```python
-import time
-
-def timeit(func):
-   def wrapper():
-      print(f"開始執行 {func.__name__}")
-      start = time.time()
-      func()
-      end = time.time()
-      print(f"執行時間：{end - start:.2f} 秒")
-   return wrapper
-
-@timeit
-def slow_task():
-   time.sleep(1)
-   print("完成任務")
-
-slow_task()
-```
-
-執行結果示例：
-
-```
-開始執行 slow_task
-完成任務
-執行時間：1.00 秒
-```
-
-範例 2：門禁裝飾器（檢查權限）
-
-```python
-def require_login(func):
-   def wrapper(user):
-      if not user:
-         print("❌ 請先登入")
-         return
-      print("✓ 已驗證身份，開始執行")
-      func(user)
-   return wrapper
-
-@require_login
-def access_system(user):
-   print(f"歡迎 {user}，進入系統")
-
-access_system("小明")    # ✓ 已驗證身份，開始執行 / 歡迎 小明，進入系統
-access_system(None)      # ❌ 請先登入
-```
-
-重點：
-
-- 裝飾器可以在不改變原本函式的情況下，幫你加上「前置或後置」行為（例如權限檢查、執行時間紀錄、快取、錯誤處理、輸入驗證等）。
-
-| 方法（Method） | 實例能執行的動作，定義在類別中 | def 方法名稱(self): |
+屬性（Attribute）就是動物的「資料」。
+例如:名字、顏色、年齡、體重，程式裡會寫成 name、color、age、weight 等欄位。
+方法（Method）就是動物的「行為」。
+例如: eat() 吃東西、sleep() 睡覺、move() 移動、bark() 叫聲，代表這個類別的動物可以做什麼事。
 
 #### Python OOP 基本範例
 
@@ -172,11 +67,11 @@ a.speak()   # 小動物 發出聲音
 d.speak()   # 柴犬：汪汪！
 ```
 
-**範例檔案：** `python_advanced/unit01_oop_basics/animal_example.py`
+**範例檔案：** `unit01_oop_basics/animal_example.py`
 
 ### 練習題
 
-#### 練習 1：基礎類別設計（難度：⭐）
+#### 練習 1：基礎類別設計
 
 建立一個 Student 類別來管理學生的成績資料。
 
@@ -196,7 +91,7 @@ d.speak()   # 柴犬：汪汪！
 平均分數：87.67 分
 ```
 
-#### 練習 2：類別屬性設計（難度：⭐⭐）
+#### 練習 2：類別屬性設計
 
 設計一個「洗衣機」類別來表示不同的洗衣機型號。
 
@@ -216,151 +111,111 @@ d.speak()   # 柴犬：汪汪！
 品牌：三星，容量：10 公斤
 ```
 
-**練習檔案：** `python_advanced/unit01_oop_basics/exercise01_student_grade.py`、`python_advanced/unit01_oop_basics/exercise02_washing_machine.py`
+**練習檔案：**
 
-### 常見問題
+* `unit01_oop_basics/exercise01_student_grade.py`
+* `unit01_oop_basics/exercise02_washing_machine.py`
 
-**Q：self 是什麼？**
-→ 就是「我自己」。物件在跟自己說話。
+### 封裝：動物自己管理身體狀態
 
-**Q：Class 一定要大寫？**
-→ 不是規定，但習慣，大家都這樣寫。
-
-**Q：物件跟變數差在哪？**
-→ 物件有「資料 + 功能」。變數只有值。
-
-#### 模組化實作練習：做三明治（難度：⭐⭐）
-
-請依下列步驟完成一個「三明治製作」的模組化程式（已在示範檔中提供範例）：
-
-1. 建立三個檔案（本教材檔案命名規範）：
-
-   - `exercise01_bread.py`：實作 `cut_bread()`，負責切麵包並列印 `麵包切好了！`
-   - `exercise02_lettuce.py`：實作 `prepare_lettuce()`，負責準備生菜並列印 `生菜洗好了！`
-   - `exercise03_sandwich.py`：整合模組，匯入前兩個模組並實作 `make_sandwich()`，最後列印 `三明治完成！`
-
-2. 在 `exercise03_sandwich.py` 中，請使用匯入語句（支援相對或頂層匯入）呼叫 `cut_bread()` 與 `prepare_lettuce()`。
-3. `exercise03_sandwich.py` 應包含 `if __name__ == "__main__"`，以便可以直接執行作為腳本測試。
-4. 將三個檔案放在 `unit03_modularity` 資料夾內，並以教材提供的檔名為準。
-
-**注意：** 若其他程式仍以舊檔名引用，本教材保留相容性處理；但正式練習請以 `exercise0X_*.py` 命名。
-
----
-
-### 子類別覆寫父類別方法（method overriding）
-
-如果有外國學生，想要用英文自我介紹，可以設計一個子類別 ForeignStudent，覆寫 introduce() 方法：
+- 外面的人不會直接「把動物的體重改成 100 公斤」，而是「給牠很多食物」，牠吃多了自然會變胖；也就是說，真正改變體重的是「吃東西」這個行為，而不是外部直接硬改數值。
+- 封裝（Encapsulation）就是物件把「體重怎麼變、健康怎麼計算」這些細節藏起來，只提供像 eat(food) 這種安全的方法讓外界操作，避免亂改內部資料造成錯誤。
 
 ```python
-class ForeignStudent(Student):
-    def introduce(self):
-        print(f"Hello, my name is {self.name}. I am in grade {self.grade}.")
+class AnimalWithEncapsulation:
+    def __init__(self, name, weight):
+        self.__name = name
+        self.__weight = weight
+
+    def eat(self, food_weight):
+        if food_weight <= 0:
+            print("食物重量必須大於 0")
+            return
+        self.__weight += food_weight * 0.2
+
+    def get_info(self):
+        return f"{self.__name} 現在體重是 {self.__weight} 公斤"
+
+
+dog_encap = AnimalWithEncapsulation("小黑", 10)
+
+print("\n--- 初始狀態 ---")
+print(dog_encap.get_info())  # 小黑 現在體重是 10 公斤
+
+print("\n--- ✅ 正確方式：使用 eat() 方法 ---")
+dog_encap.eat(5)  # 進食 5 公斤食物
+print(dog_encap.get_info())  # 小黑 現在體重是 11.0 公斤（增加 5 * 0.2）
+
+print("\n--- ❌ 不建議的方式：試圖直接修改私有屬性 ---")
+print("  嘗試執行: dog_encap.__weight = 999")
+dog_encap.__weight = 999  # 這會建立一個新屬性，不會修改真正的 __weight
+print(f"  結果: {dog_encap.get_info()}")
+print("  說明：仍然是 11.0，因為真正的 __weight 沒有被修改")
+
+print("\n")
 ```
 
-- 原本所有學生都是用中文介紹，外國學生則改用英文。
+### 繼承：從「動物」延續的物種「狗、貓、鳥」
 
----
-
-### 多型 (Polymorphism)-設計可擴充的程式架構
-
-多型（Polymorphism）是指：多個不同子類別可以用統一的方式被呼叫，程式不用管「具體是哪一種」，只要是同一個家族，就能順利執行相同的操作。
-
-我們可以設計一個統一的「自我介紹」流程，任何類型學生都可以用同一方法呼叫：
+- 可以先定義一個 Animal 類別，裡面放所有動物共有的屬性（name、age）和行為（eat()、sleep()、move()）。
+- 然後 Dog、Cat、Bird 這些類別「繼承（Inheritance）Animal」，自動擁有吃和睡的功能，再加上各自的特色，例如 Dog 多了 bark()、Bird 多了 fly()。
 
 ```python
-def show_introduction(student):
-    student.introduce()
+class Dog(Animal):
+    def speak(self):
+        print(f"{self.name}：汪汪！")
 
-ming = Student("小明", 3)
-john = ForeignStudent("John", 2)
 
-show_introduction(ming)   # 大家好，我是3年級的小明。
-show_introduction(john)   # Hello, my name is John. I am in grade 2.
-```
+class Cat(Animal):
+    def speak(self):
+        print(f"{self.name}：喵喵！")
 
-- 無論新增什麼特殊學生類型，只需繼承自 Student 並定義 introduce() 方法即可自動適用。
 
----
+# 建立子類實例
+dog = Dog("柴犬")
+cat = Cat("波斯貓")
 
-父類別集中共用功能 → 子類別可依需要客製化 → 多型讓介面一致、擴充容易
+print("\n--- 不同子類的 speak() 方法 ---")
+dog.speak()  # 柴犬：汪汪！
+cat.speak()  # 波斯貓：喵喵！
 
-### 練習題
-
-#### 練習 1：基礎父類別設計（難度：⭐）
-
-學校要管理學生資料，所有學生都有「姓名」和「學號」兩項基本資訊，以及「顯示基本資訊」的功能。
-
-**任務：**
-
-```
-1. 建立一個名為 Student 的父類別
-2. 屬性：name（姓名）、student_id（學號）
-3. 方法：show_info()，能夠印出「我是 [姓名]，學號是 [學號]」
-4. 建立兩個學生實例並呼叫 show_info() 方法
-```
-
-**期望輸出：**
-
-```
-我是小明，學號是 S001
-我是小花，學號是 S002
+print("\n")
 
 ```
 
-#### 練習 2：子類別覆寫方法（難度：⭐⭐）
+### 多型：同樣是 move()，表現卻不同
 
-學校有不同科系的學生（例如資訊系、英文系），他們除了基本資訊外，還需要顯示自己的專長。
+- 在程式裡，可以只寫一個 move() 方法名稱，但不同動物可以「用自己的方式移動」：Dog 的 move() 是用跑的、Bird 的 move() 是用飛的、Fish 的 move() 是用游的。
+- 多型（Polymorphism）就是主程式只管呼叫 animal.move()，不管這是狗、貓還是鳥，實際執行時會跑到各自類別裡的 move() 實作，讓同一個指令可以有不同表現。
 
-**任務：**
+```python
 
-```
-1. 建立父類別 Student（含 name、student_id）
-2. 建立子類別 ComputerStudent（資訊系學生）
-   - 新增屬性：programming_language（程式語言）
-   - 覆寫 show_info() 方法：「我是 [姓名]，專長是 [程式語言]」
-3. 建立子類別 EnglishStudent（英文系學生）
-   - 新增屬性：language_level（英文程度）
-   - 覆寫 show_info() 方法：「我是 [姓名]，英文程度是 [程度]」
-4. 分別建立各科系學生實例並呼叫 show_info()
+animals = [Dog(), Bird(), Fish()]
 
-```
+for animal in animals:
+    animal.move()   
+# 同樣呼叫 move()，實際表現依物件類別而變
 
-**期望輸出：**
-
-```
-我是小明，專長是 Python
-我是小花，英文程度是 Advanced
-```
-
-#### 練習 3：多型應用（難度：⭐⭐⭐）
-
-學校要開辦「學生成果分享會」，不同科系的學生用不同方式展示自己的成果。
-
-**任務：**
-
-```
-1. 建立父類別 Student（含 name）
-2. 建立子類別 ComputerStudent 和 EnglishStudent
-3. 在各子類別中實現 demonstrate()（展示）方法：
-   - ComputerStudent.demonstrate()：「[姓名]展示了一個 Python 程式」
-   - EnglishStudent.demonstrate()：「[姓名]朗讀了一篇英文文章」
-4. 建立一個函式 student_showcase(students_list)
-   - 接收一個學生清單
-   - 對每個學生呼叫 demonstrate() 方法（多型應用）
-5. 建立包含不同科系學生的清單，呼叫 student_showcase()
-
+# 輸出：
+# Dog runs
+# Bird flies
+# Fish swims
 
 ```
 
-**期望輸出：**
+## 物件導向觀念對照表（以動物為例）
 
-```
-小明展示了一個 Python 程式
-小花朗讀了一篇英文文章
-大衛展示了一個 Java 程式
-```
+| 觀念               | 簡單定義                                                     | 在動物世界的例子                                       | 在程式裡大概長什麼樣子                |
+| ------------------ | ------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------- |
+| 類別 Class         | 一種「種類／設計圖」，定義這一類東西的共同特徵與能力。       | Animal、Dog、Cat 這些「動物種類」。                    | `class Animal { ... }`              |
+| 物件 Object        | 從類別生出來的「實體」，真的存在的一個個東西。               | 小黑（那一隻狗）、小花（那一隻貓）。                   | `dog1 = new Dog()`                  |
+| 屬性 Attribute     | 描述物件狀態的資料。                                         | 名字、顏色、年齡、體重。                               | `name`, `age`, `weight`         |
+| 方法 Method        | 物件可以做的動作或功能。                                     | 吃、睡、移動、叫（eat、sleep、move、bark）。           | `eat()`, `sleep()`, `move()`    |
+| 封裝 Encapsulation | 把資料和操作包在物件裡，外面不能直接亂改，只能透過方法存取。 | 不能直接改體重，只能餵食，體重由動物自己依吃多少變化。 | `private weight` 搭配 `eat(food)` |
+| 繼承 Inheritance   | 新類別沿用舊類別的屬性與方法，並能再加上自己的。             | Dog、Cat 從 Animal 繼承吃和睡，再各自加上 bark、meow。 | `class Dog extends Animal { ... }`  |
+| 多型 Polymorphism  | 同一個介面或方法名，不同類別可以有不同實作。                 | 都是 move()：狗用跑的、鳥用飛的、魚用游的。            | `animal.move()`                     |
 
-#### 練習 4： 綜合應用 - 課程管理系統（難度：⭐⭐⭐⭐）
+#### 練習 3： 綜合應用 - 課程管理系統
 
 設計一個簡單的課程管理系統，讓不同科系學生可以註冊課程、查看成績。
 
@@ -399,11 +254,23 @@ show_introduction(john)   # Hello, my name is John. I am in grade 2.
 
 ```
 
-**範例檔案：** `python_advanced/unit02_oop_advanced/inheritance_example1.py`
+**練習檔案：**
 
-**練習檔案：** `python_advanced/unit02_oop_advanced/exercise01_basic_parent_class.py`、`python_advanced/unit02_oop_advanced/exercise02_method_overriding.py`、`python_advanced/unit02_oop_advanced/exercise03_polymorphism.py`、`python_advanced/unit02_oop_advanced/exercise04_course_management.py`
+* `unit01/exercise03_basic_parent_class.py`
+* `unit01/exercise04_method_overriding.py`
+* `unit01/exercise05_polymorphism.py`
+* `unit01/exercise06_course_management.py`
 
 ### 常見問題
+
+**Q：self 是什麼？**
+→ 就是「我自己」。物件在跟自己說話。
+
+**Q：Class 一定要大寫？**
+→ 不是規定，但習慣，大家都這樣寫。
+
+**Q：物件跟變數差在哪？**
+→ 物件有「資料 + 功能」。變數只有值。
 
 **Q：繼承就是複製貼上嗎？**
 → 不是，是「延伸」，不用重寫重複的東西。
@@ -425,79 +292,50 @@ show_introduction(john)   # Hello, my name is John. I am in grade 2.
 
 ---
 
-## 單元 3：模組化（把程式拆乾淨）
+## 單元 2：模組化程式開發
 
-### 單元重點
+### 什麼是「模組」?
 
-- 了解模組化的核心概念與重要性
-- 學會如何將程式拆分成多個檔案（模組）
-- 熟悉 import 與模組的使用方法
-- 實作 `__name__ == "__main__"` 的應用
-- 提升程式可維護性與團隊協作效率
+在 Python 裡，一個 模組 就是一個副檔名是 .py 的檔案，裡面放相關的一組程式碼，例如一堆計算用的函式。
 
-#### 什麼是「模組化」？
+當程式變大時，不可能所有程式都塞在同一個檔案，所以會把不同功能拆到不同的模組裡，再讓主程式去呼叫。
 
-用最簡單的說法：「模組化」就是把你的程式拆小塊，每一塊都只管自己這件事。像積木一樣，把功能整理在不同的檔案，讓程式變得好管理、好維護。
+可以把整個程式想成一個工具箱，模組就像不同的小盒子：螺絲起子放一盒、扳手放一盒，需要什麼就打開那盒來用。
 
-#### 為什麼要模組化？
+這樣找東西比較快，也不會所有工具混成一團，之後要新增或更換工具也更方便。
 
-- 程式寫多了，功能一堆，如果都塞在一個檔案，根本找不到要改的東西。
-- 分成一塊一塊，你要改哪一部分，就去那一塊找，超省時間。
-- 跟別人合作時，也不會互相打架，大家各做各的部分。
+### 為什麼要模組化?
 
-#### 生活化範例
+* **「重複使用」**：常用的功能（像是計算成績、處理檔案）寫成模組，以後別的專案也能直接 import 來用，不用重寫。
+* **「好維護」**：如果成績計算有 bug，只要改那個模組檔案，所有用到它的程式就一起變正確。
 
-你家所有東西都塞同一個大箱子 → 亂得要死。
-模組化就是把東西分門別類。
+### 模組和套件的差別?
 
-假設你要做一個「學生選課」小程式：
+模組是「一個檔案」，套件（package）則是「一個資料夾」，裡面可以裝很多模組檔案，用來組成更大的功能集合。
 
-把管理學生的功能放一個檔案：
-
-```python
-# student.py
-class Student:
-    pass
-```
-
-把管理課程的功能放一個檔案：
-
-```python
-# course.py
-def enroll():
-    pass
-```
-
-寫一個主程式（main.py）只負責整合和執行：
-
-```python
-# main.py
-from student import Student
-from course import enroll
-
-# 主程式只負責整合功能
-```
-
-**模組化**不只讓程式管理清楚，讓做專案像堆積木一樣，想要加東西、改東西更加方便。
+比方說一個專案資料夾裡，有好幾個處理不同功能的模組檔案，就可以一起當成一個套件來管理。
 
 ### 練習題
 
-##### 模組化實作練習：做三明治（難度：⭐⭐）
+#### 模組化實作練習：做三明治
 
-請依下列步驟完成一個「三明治製作」的模組化程式（教材範例已改為 `exercise0X` 命名）：
+請依下列步驟完成一個「三明治製作」的模組化程式：
 
 1. 建立或使用以下檔案：
 
    - `exercise01_bread.py`：實作 `cut_bread()`（切麵包）
    - `exercise02_lettuce.py`：實作 `prepare_lettuce()`（準備生菜）
    - `exercise03_sandwich.py`：主程式，匯入並呼叫前兩者以組合三明治
-
 2. 在 `exercise03_sandwich.py` 中示範如何呼叫上述函式並在最後印出 `三明治完成！`。
 3. 包含 `if __name__ == "__main__"`，以便直接執行測試。
 
-請將檔案放在 `unit03_modularity` 資料夾中，並以 `exercise0X` 命名方式提交練習。
+請將檔案放在 `unit02_modularity` 資料夾中，並以 `exercise0X` 命名方式提交練習。
 
-**練習檔案：** `python_advanced/unit03_modularity/exercise01_bread.py`、`python_advanced/unit03_modularity/exercise02_lettuce.py`、`python_advanced/unit03_modularity/exercise03_sandwich.py`
+**練習檔案：**
+
+* `unit02_modularity/exercise01_bread.py`
+* `unit02_modularity/exercise02_lettuce.py`
+* `unit02_modularity/exercise03_sandwich.py`
 
 ### 常見問題
 
@@ -518,14 +356,7 @@ from course import enroll
 
 ---
 
-## 單元 4：Python 內建模組
-
-### 單元重點
-
-- 學會看官方文件
-- 操作常用模組：os、pathlib、datetime、shutil
-- 檔案系統操作
-- 時間和日期處理
+## 單元 3：Python 內建模組
 
 ### 什麼是 Python 內建模組？
 
@@ -542,6 +373,8 @@ print(math.sqrt(16))  # 開根號，輸出 4.0
 print(math.pi)        # 圓周率
 ```
 
+**範例檔案：** `unit03_builtin_modules/example_math.py`
+
 2. random
    隨機數（抽籤、選號碼）
 
@@ -550,6 +383,8 @@ import random
 print(random.randint(1, 10))   # 隨機整數 1~10
 print(random.choice(['A', 'B', 'C']))  # 隨機選一個
 ```
+
+**範例檔案：** `unit03_builtin_modules/example_random.py`
 
 3. datetime
    處理時間與日期
@@ -561,6 +396,8 @@ print(now)  # 現在時間
 print(now.year, now.month, now.day)
 ```
 
+**範例檔案：** `unit03_builtin_modules/example_datetime.py`
+
 4. os
    跟作業系統互動（像瀏覽檔案、建立資料夾）
 
@@ -570,6 +407,8 @@ print(os.listdir('.'))  # 列出目前資料夾的檔案
 os.mkdir('testdir')     # 建立資料夾
 ```
 
+**範例檔案：** `unit03_builtin_modules/example_os.py`
+
 5. sys
    取得 Python 系統與參數資訊
 
@@ -578,6 +417,8 @@ import sys
 print(sys.version)  # Python 版本
 print(sys.argv)     # 執行程式時的參數清單
 ```
+
+**範例檔案：** `unit03_builtin_modules/example_sys.py`
 
 6. json
    讓你可以把字典等資料變成文字（序列化、一樣反過來也行）
@@ -591,46 +432,11 @@ data2 = json.loads(json_str)  # 變回原本資料型態
 print(data2)
 ```
 
-### 生活化範例
-
-線上教學抽獎／隨機選人
-
-需求：你要從一群學生名字裡，隨機抽出幸運兒、分組或作活動。
-
-用到的模組：random
-
-解法示範
-
-```python
-import random
-
-students = ['小明', '小美', '阿強', '阿花', 'Amy', 'John']
-winner = random.choice(students)
-print(f"這次抽獎中獎學生是：{winner}")
-```
-
-延伸玩法：
-
-如果要一次抽出三個人做小組
-
-```python
-group = random.sample(students, 3)
-print("小組成員：", group)
-```
-
-如果要亂數排序所有名字分成兩組
-
-```python
-random.shuffle(students)
-group1 = students[:3]
-group2 = students[3:]
-print("第一組：", group1)
-print("第二組：", group2)
-```
+**範例檔案：** `unit03_builtin_modules/example_json.py`
 
 ### 練習題
 
-#### 練習 1：抽獎與分組（難度：⭐）
+#### 練習 1：抽獎與分組
 
 使用 `random` 實作抽獎與分組功能：
 
@@ -647,7 +453,11 @@ print("第二組：", group2)
 第二組： ['小美', 'Amy', '阿強']
 ```
 
-#### 練習 2：數學工具應用（難度：⭐）
+**範例檔案：** `unit03_builtin_modules/exercise01_random.py`
+
+---
+
+#### 練習 2：數學工具應用
 
 使用 `math` 實作兩個小功能：
 
@@ -656,7 +466,9 @@ print("第二組：", group2)
 
 期望示範：輸入 (3,4) 得到 5.0；輸入 90 度得到 sin≈1.0。
 
-#### 練習 3：時間與檔名（難度：⭐）
+**範例檔案：** `unit03_builtin_modules/exercise02_math.py`
+
+#### 練習 3：時間與檔名
 
 使用 `datetime` 建立以時間為基礎的檔名與時間顯示：
 
@@ -670,7 +482,9 @@ print("第二組：", group2)
 filename: report_20251123_143005.txt
 ```
 
-#### 練習 4：檔案系統基本操作（難度：⭐⭐）
+**範例檔案：** `unit03_builtin_modules/exercise03_datetime.py`
+
+#### 練習 4：檔案系統基本操作
 
 使用 `os` 或 `pathlib` 實作簡單的檔案管理工具：
 
@@ -678,7 +492,9 @@ filename: report_20251123_143005.txt
 - `ensure_dir(path)`：如果資料夾不存在就建立（使用 `os.makedirs` 或 `Path.mkdir(parents=True, exist_ok=True)`)。
 - `group_by_extension(path)`：把目錄下的檔案依副檔名分組並回傳字典（副檔名 -> 檔名清單）。
 
-#### 練習 5：JSON 與系統參數（難度：⭐）
+**範例檔案：** `unit03_builtin_modules/exercise04_filesystem.py`
+
+#### 練習 5：JSON 與系統參數
 
 結合 `json` 與 `sys`：
 
@@ -691,9 +507,7 @@ filename: report_20251123_143005.txt
 save_students.py students.json load_students.py students.json
 ```
 
-**範例檔案：** `python_advanced/unit04_builtin_modules/example_math.py`、`python_advanced/unit04_builtin_modules/example_random.py`、`python_advanced/unit04_builtin_modules/example_datetime.py`、`python_advanced/unit04_builtin_modules/example_os_pathlib.py`、`python_advanced/unit04_builtin_modules/example_json_sys.py`
-
-**練習檔案：** `python_advanced/unit04_builtin_modules/exercise01_random.py`、`python_advanced/unit04_builtin_modules/exercise02_math.py`、`python_advanced/unit04_builtin_modules/exercise03_datetime.py`、`python_advanced/unit04_builtin_modules/exercise04_filesystem.py`、`python_advanced/unit04_builtin_modules/save_students.py`、`python_advanced/unit04_builtin_modules/load_students.py`
+**範例檔案：** `unit03_builtin_modules/exercise05_load_students.py`
 
 ### AI 協助學習 Prompt
 
@@ -706,18 +520,19 @@ save_students.py students.json load_students.py students.json
 
 ---
 
-## 單元 5：閉包 & 裝飾器（@ 的真相）
-
-### 單元重點
-
-- 函式是可以被當成變數的
-- 閉包 = 函式記得某個值
-- 裝飾器可以替程式「加功能」
-- 如何寫出可重複使用的裝飾器
+## 單元 4：閉包 & 裝飾器（@ 的真相）
 
 ### 什麼是閉包?（Closure）
 
-- **定義**：閉包是一個函式，它能存取並記住外層函式的變數，就算外層函式已經執行結束。
+**定義**：可以把閉包想成「會記住東西的函式」。一個函式裡面再定義一個小函式，小函式會用到外面那個函式的變數，然後外面那個函式把小函式「return 回去」，這時得到的小函式，就會一直記得那些變數的值。
+
+就算外面的函式早就跑完了、照理說變數應該消失了，但這個小函式還是能用那些變數，因為 Python 幫它把需要的變數「包起來」一起帶走，這一包就是閉包。
+
+**生活比喻:**
+想像你去補習班，老師上完一堂課（外層函式結束），但是你筆記裡的重點（變數）會被你帶回家，小抄就是那個「內層函式」，隨時可以打開來用先前記住的內容，這就是閉包的感覺。
+
+所以閉包常拿來做「記住某個設定」的函式，比如先設定好稅率 5%，之後每次把金額丟進去，它都用同一個稅率幫你算，不用每次都再傳 5% 進去。
+
 - **範例**：
 
 ```python
@@ -734,8 +549,11 @@ say_hello()  # 輸出：外層變數: Hello closure!
 
 ### 什麼是裝飾器?（Decorator）
 
-- **定義**：裝飾器是一個函式，能在不改變原本功能的情況下，替其他函式增加額外的行為（前置或後置動作）。
-- **範例**：
+**定義**：裝飾器就是「幫函式加功能的工具」，而且「不改動原本的函式裡面程式碼」。寫一個函式 A，專門負責「包住」別的函式，讓別的函式在執行前後，多做一些事情，例如：先印一行「開始執行」、算執行時間、檢查權限等等。
+
+在 Python 裡，用 `@裝飾器名稱` 放在函式上面，就是在說「這個函式要先經過這個裝飾器處理」，像是 `@login_required`、`@app.route('/')` 這種都是裝飾器的用法。
+
+**範例**：
 
 ```python
 def my_decorator(func):
@@ -760,12 +578,7 @@ Hi, Python!
 執行後
 ```
 
-### 生活化範例
-
-閉包（Closure）生活化比喻 — 計數器或專屬筆記本：
-
-- 想像你有一個專屬的小筆記本（只屬於某個人），每次他做一件事就寫下一筆，筆記本會一直記得這個人的歷史記錄，即使你把寫下記錄的那個程式（外層函式）傳走或不再執行，筆記本（閉包）仍保有那個人的狀態（外層變數）。
-- 在程式中，閉包常用來實作計數器、狀態儲存或工廠函式（返回特殊行為的函式）。
+#### 範例檔: 計數器
 
 ```python
 # closure_counter.py
@@ -786,7 +599,9 @@ if __name__ == "__main__":
    bob()
 ```
 
-**範例檔案：** `python_advanced/unit05_closure_decorator/closure_example.py`
+**範例檔案：** `unit04_closure_decorator/closure_example.py`
+
+下面範例是在示範「用裝飾器統一做登入驗證」，用來「幫函式加上一層登入檢查」的功能。
 
 ```python
 # require_login.py
@@ -811,12 +626,9 @@ if __name__ == "__main__":
    access_system(None)
 ```
 
-**範例檔案：** `python_advanced/unit05_closure_decorator/require_login_example.py`
+**範例檔案：** `unit05_closure_decorator/require_login_example.py`
 
-裝飾器（Decorator）生活化比喻 — 門禁、日誌或前後處理：
-
-- 例如你進公司要刷門禁，門禁系統會先檢查你有沒有權限（這是一層「前置」行為），通過才會到真正的辦公行為；這跟裝飾器很像，裝飾器在不改變原本功能的前提下，替函式增加前置或後置動作（例如權限檢查、記錄執行時間、錯誤處理、快取等）。
-- 在實務上，裝飾器可用於輸入驗證、API 權限檢查、緩存或性能監控等情境。
+下列範例「帶參數的裝飾器」，用來檢查使用者是不是指定角色（例如 admin），不是的話就擋掉不讓執行。帶參數的裝飾器常用在權限控制、以角色為基礎的存取控制這類情境。
 
 ```python
 # role_decorator.py
@@ -844,11 +656,11 @@ if __name__ == "__main__":
    delete_resource(guest)
 ```
 
-**範例檔案：** `python_advanced/unit05_closure_decorator/timeit_example.py`（時間裝飾器範例）
+**範例檔案：** `unit05_closure_decorator/timeit_example.py`（時間裝飾器範例）
 
 ### 練習題
 
-練習 1：購物車的計數器（難度：⭐）
+#### 練習 1：購物車的計數器
 
 要求：
 
@@ -856,7 +668,7 @@ if __name__ == "__main__":
 - 支持「加商品」、「移除商品」、「查看購物車總額」三個操作
 - 確保不同顧客的購物車互不影響
 
-練習 2：銀行提款限制（難度：⭐⭐）
+#### 練習 2：銀行提款限制
 
 要求：
 
@@ -864,7 +676,7 @@ if __name__ == "__main__":
 - 建立另一個裝飾器檢查帳戶餘額是否足夠
 - 套用兩個裝飾器到提款函式上
 
-練習 3：API 呼叫的重試機制（難度：⭐⭐）
+#### 練習 3：API 呼叫的重試機制
 
 要求：
 
@@ -872,7 +684,7 @@ if __name__ == "__main__":
 - 每次重試前等待 1 秒
 - 顯示重試次數與結果
 
-練習 4：自訂快取裝飾器（難度：⭐⭐⭐）
+練習 4：自訂快取裝飾器
 
 要求：
 
@@ -893,15 +705,7 @@ if __name__ == "__main__":
 
 ---
 
-## 單元 6：檔案與資料處理（CSV / JSON / Error）
-
-### 單元重點
-
-- 讀寫檔案（文字檔案操作）
-- 匯入匯出 CSV（處理表格資料）
-- JSON 序列化與反序列化（資料交換格式）
-- try-except 處理錯誤（健壯的程式設計）
-- 資料驗證與清理（資料品質管理）
+## 單元 5：檔案與資料處理（CSV / JSON / Error）
 
 ### 什麼是檔案與資料處理？
 
@@ -914,9 +718,7 @@ if __name__ == "__main__":
 
 Python 提供了豐富的工具來處理各種格式的檔案和資料。
 
-### 生活化範例
-
-#### 導師整理成績的困擾
+### 生活範例應用
 
 你是班導師，期末要整理全班 40 位學生的成績：
 
@@ -939,11 +741,9 @@ Python 提供了豐富的工具來處理各種格式的檔案和資料。
 1. **文字檔案**：筆記、日記、設定檔
 
    - 例如：儲存每日學習筆記、讀取設定檔
-
 2. **CSV 檔案**：表格資料（像 Excel）
 
    - 例如：學生名單、成績表、銷售記錄
-
 3. **JSON 檔案**：結構化資料（網站常用）
 
    - 例如：使用者資料、設定資料、API 回應
@@ -976,17 +776,14 @@ with open("diary.txt", "a", encoding="utf-8") as f:
     f.write("下午繼續練習！\n")
 ```
 
-**重點：**
-
-- `with open()` 會自動關閉檔案，不用擔心忘記關閉
-- `encoding="utf-8"` 確保中文不會亂碼
-- `"w"` 寫入、`"r"` 讀取、`"a"` 附加
-
-**範例檔案：** `python_advanced/unit06_file_data_processing/example01_basic_file.py`
+**範例檔案：** `unit05_file_data_processing/example01_basic_file.py`
 
 ### CSV 檔案處理
 
-CSV（Comma-Separated Values）就是用逗號分隔的表格資料，像 Excel 的簡化版。
+#### 什麼是 CSV 檔
+
+CSV 是一種「純文字格式」，但裡面的資料長得像表格：一列一列的資料，欄位之間用逗號分開，例如：Name,Age,Gender。
+副檔名通常是 .csv，可以用 Excel、Google 試算表打開，也可以用記事本之類的文字編輯器打開, CSV 通用性很高：幾乎所有系統（資料庫、網站後台、統計軟體）都能讀寫 CSV，用來「匯入、匯出資料」超方便。
 
 #### 寫入 CSV
 
@@ -1026,17 +823,13 @@ with open("students.csv", "r", encoding="utf-8-sig") as f:
         print(f"{row['姓名']}：國文 {row['國文']}，英文 {row['英文']}")
 ```
 
-**重點：**
-
-- `csv.writer()` 用來寫入 CSV
-- `csv.DictReader()` 可以用欄位名稱存取資料（像字典）
-- `encoding="utf-8-sig"` 確保 Excel 可以正確開啟中文
-
-**範例檔案：** `python_advanced/unit06_file_data_processing/example02_csv_operations.py`
+**範例檔案：** `unit05_file_data_processing/example02_csv_operations.py`
 
 ### JSON 處理
 
-JSON（JavaScript Object Notation）是網路上最常用的資料交換格式。
+JSON 全名是 JavaScript Object Notation，是一種「用文字描述資料結構」的格式，副檔名通常是 .json
+
+JSON 是網路上最常用的資料交換格式，可以把它想成「有階層結構的資料筆記本」，用一種固定格式把資料寫成文字，讓人和程式都看得懂、都能互相交換
 
 #### Python 資料轉 JSON
 
@@ -1091,18 +884,11 @@ for student in students:
     print(f"{student['name']} ({student['age']} 歲)")
 ```
 
-**重點：**
-
-- `json.dumps()` / `json.loads()` 處理字串
-- `json.dump()` / `json.load()` 處理檔案
-- `ensure_ascii=False` 確保中文正常顯示
-- `indent=2` 讓 JSON 更易讀
-
-**範例檔案：** `python_advanced/unit06_file_data_processing/example03_json_operations.py`
+**範例檔案：** `unit05_file_data_processing/example03_json_operations.py`
 
 ### 錯誤處理（try-except）
 
-在處理檔案時，很多事情可能出錯：檔案不存在、格式錯誤、權限不足等。
+在寫程式的過程中，尤其是處理檔案時，很多事情可能出錯：檔案不存在、格式錯誤、權限不足等。
 
 #### 處理檔案不存在
 
@@ -1143,22 +929,27 @@ finally:
     print("→ 無論成功或失敗都會執行")
 ```
 
-**重點：**
+**重點整理：**
 
 - `try-except` 捕捉錯誤，避免程式崩潰
 - `FileNotFoundError`：檔案不存在
 - `ValueError`：資料格式轉換錯誤
 - `finally`：無論如何都會執行（用於清理資源）
 
-**範例檔案：** `python_advanced/unit06_file_data_processing/example04_error_handling.py`
+**範例檔案：** `unit05_file_data_processing/example04_error_handling.py`
 
 ### 資料驗證與清理
 
-處理真實資料時，經常會遇到「髒資料」：
+資料驗證是在「資料進來的當下」檢查：有沒有填、格式對不對、範圍合不合理，例如年齡必須在 0～120、學生年級只能是 1–3 年級、Email 一定要有 @。
+資料清理是在「資料已經收集完之後」再回頭整理，找出錯誤、缺失或不一致的地方，並做修正或刪除。
+
+處理真實資料時，經常會遇到「髒資料」，例如：
 
 - 缺漏值（空白、None）
 - 格式錯誤（應該是數字卻是文字）
 - 超出範圍（年齡 -5 歲、分數 150 分）
+
+因此，資料驗證是先檢查資料合不合理，資料清理是把已經收集到的髒資料整理乾淨，兩個都是為了讓分析結果可信。
 
 #### 驗證資料範例
 
@@ -1227,11 +1018,11 @@ def clean_student_data(input_file, output_file):
         writer.writerows(clean_rows)
 ```
 
-**範例檔案：** `python_advanced/unit06_file_data_processing/example05_data_cleaning.py`
+**範例檔案：** `unit05_file_data_processing/example05_data_cleaning.py`
 
 ### 練習題
 
-#### 練習 1：讀寫文字檔案（難度：⭐）
+#### 練習 1：讀寫文字檔案
 
 建立日記系統，實作以下功能：
 
@@ -1250,9 +1041,9 @@ read_diary("my_diary.txt")
 # 晚上繼續練習
 ```
 
-**練習檔案：** `python_advanced/unit06_file_data_processing/exercise01_read_write.py`
+**練習檔案：** `unit05_file_data_processing/exercise01_read_write.py`
 
-#### 練習 2：處理 CSV 成績資料（難度：⭐⭐）
+#### 練習 2：處理 CSV 成績資料
 
 建立成績處理系統：
 
@@ -1270,9 +1061,9 @@ read_diary("my_diary.txt")
 第 3 名：小明 （87.67 分）
 ```
 
-**練習檔案：** `python_advanced/unit06_file_data_processing/exercise02_csv_grade.py`
+**練習檔案：** `unit05_file_data_processing/exercise02_csv_grade.py`
 
-#### 練習 3：JSON 資料備份與還原（難度：⭐⭐）
+#### 練習 3：JSON 資料備份與還原
 
 建立資料備份系統：
 
@@ -1285,9 +1076,9 @@ read_diary("my_diary.txt")
 
 程式意外關閉或資料遺失時，可以從 JSON 備份檔快速還原。
 
-**練習檔案：** `python_advanced/unit06_file_data_processing/exercise03_json_backup.py`
+**練習檔案：** `unit05_file_data_processing/exercise03_json_backup.py`
 
-#### 練習 4：資料驗證與錯誤處理（難度：⭐⭐⭐）
+#### 練習 4：資料驗證與錯誤處理
 
 建立健壯的資料處理系統：
 
@@ -1313,9 +1104,9 @@ read_diary("my_diary.txt")
     - 成績 150 超出範圍
 ```
 
-**練習檔案：** `python_advanced/unit06_file_data_processing/exercise04_data_validation.py`
+**練習檔案：** `unit05_file_data_processing/exercise04_data_validation.py`
 
-#### 練習 5：綜合應用 - 學生成績管理系統（難度：⭐⭐⭐⭐）
+#### 練習 5：綜合應用 - 學生成績管理系統
 
 整合所有學到的技術，建立完整的管理系統：
 
@@ -1342,7 +1133,7 @@ system.backup_to_json()
 system.export_to_csv("report.csv")
 ```
 
-**練習檔案：** `python_advanced/unit06_file_data_processing/exercise05_integrated_system.py`
+**練習檔案：** `unit05_file_data_processing/exercise05_integrated_system.py`
 
 ### 常見問題
 
@@ -1384,18 +1175,7 @@ system.export_to_csv("report.csv")
 
 ---
 
-## 單元 7：關聯式資料庫（SQL + SQLite）
-
-### 單元重點
-
-本單元學習如何使用 SQLite 資料庫進行資料管理：
-
-- **資料庫基礎概念**：理解關聯式資料庫、資料表、欄位、記錄的概念
-- **SQLite 操作**：建立資料庫、建立資料表、插入/更新/刪除資料
-- **SQL 查詢語法**：SELECT、WHERE、ORDER BY、GROUP BY、JOIN 等
-- **Python 連接資料庫**：使用 sqlite3 模組進行資料庫操作
-- **交易處理**：使用 BEGIN、COMMIT、ROLLBACK 確保資料一致性
-- **進階查詢**：多表 JOIN、聚合函數、子查詢等
+## 單元 6：關聯式資料庫（SQL + SQLite）
 
 ### 為什麼要學資料庫？
 
@@ -1412,7 +1192,7 @@ system.export_to_csv("report.csv")
 - ✅ **多人存取**：同時有很多人查詢、修改資料
 - ✅ **交易安全**：確保資料更新的完整性（要嘛全部成功，要嘛全部取消）
 
-### 生活化範例：學生成績管理
+### 範例：學生成績管理
 
 **情境：**
 
@@ -1565,7 +1345,7 @@ select_all_students(conn)
 conn.close()
 ```
 
-**範例檔案：** `python_advanced/unit07_sql_database/example01_basic_sqlite.py`
+**範例檔案：** `unit06_sql_database/example01_basic_sqlite.py`
 
 #### 範例 2：CRUD 操作（類別封裝）
 
@@ -1675,7 +1455,7 @@ class StudentDatabase:
         self.conn.close()
 ```
 
-**範例檔案：** `python_advanced/unit07_sql_database/example02_crud_operations.py`
+**範例檔案：** `unit06_sql_database/example02_crud_operations.py`
 
 #### 範例 3：SQL 查詢範例
 
@@ -1766,7 +1546,7 @@ for row in cursor.fetchall():
 conn.close()
 ```
 
-**範例檔案：** `python_advanced/unit07_sql_database/example03_query_examples.py`
+**範例檔案：** `unit06_sql_database/example03_query_examples.py`
 
 #### 範例 4：多表 JOIN 查詢
 
@@ -1885,7 +1665,7 @@ for row in cursor.fetchall():
 conn.close()
 ```
 
-**範例檔案：** `python_advanced/unit07_sql_database/example04_join_tables.py`
+**範例檔案：** `unit06_sql_database/example04_join_tables.py`
 
 #### 範例 5：交易處理（Transaction）
 
@@ -1996,11 +1776,11 @@ for row in cursor.fetchall():
 conn.close()
 ```
 
-**範例檔案：** `python_advanced/unit07_sql_database/example05_transaction.py`
+**範例檔案：** `unit06_sql_database/example05_transaction.py`
 
 ### 練習題
 
-#### 練習 1：建立資料庫 ⭐
+#### 練習 1：建立資料庫
 
 **任務：** 建立課程資料庫，包含課程名稱、授課老師、學分數、上課時間。
 
@@ -2011,9 +1791,9 @@ conn.close()
 3. 插入至少 5 筆課程資料
 4. 查詢並顯示所有課程
 
-**練習檔案：** `python_advanced/unit07_sql_database/exercise01_create_database.py`
+**練習檔案：** `unit06_sql_database/exercise01_create_database.py`
 
-#### 練習 2：查詢練習 ⭐⭐
+#### 練習 2：查詢練習
 
 **任務：** 使用 SQLite 進行各種查詢操作。
 
@@ -2029,9 +1809,9 @@ conn.close()
    - 計算平均價格
    - 找出庫存不足（< 10）的產品
 
-**練習檔案：** `python_advanced/unit07_sql_database/exercise02_query_practice.py`
+**練習檔案：** `unit06_sql_database/exercise02_query_practice.py`
 
-#### 練習 3：成績統計系統 ⭐⭐⭐
+#### 練習 3：成績統計系統
 
 **任務：** 建立學生成績管理系統，包含多個資料表和統計功能。
 
@@ -2046,9 +1826,9 @@ conn.close()
    - 找出每個科目的最高分學生
    - 列出不及格（< 60）的成績記錄
 
-**練習檔案：** `python_advanced/unit07_sql_database/exercise03_grade_statistics.py`
+**練習檔案：** `unit06_sql_database/exercise03_grade_statistics.py`
 
-#### 練習 4：圖書館借閱系統 ⭐⭐⭐⭐
+#### 練習 4：圖書館借閱系統
 
 **任務：** 建立完整的圖書館借閱管理系統。
 
@@ -2065,7 +1845,7 @@ conn.close()
    - 統計熱門書籍
 3. 使用交易處理確保資料一致性
 
-**練習檔案：** `python_advanced/unit07_sql_database/exercise04_library_system.py`
+**練習檔案：** `unit06_sql_database/exercise04_library_system.py`
 
 ### 重點觀念整理
 
@@ -2078,7 +1858,7 @@ conn.close()
 **Q：什麼是 FOREIGN KEY？**
 → 外鍵，用來建立資料表之間的關聯，確保資料完整性。
 
-**Q：為什麼要用 ? 佔位符而不是字串拼接？**
+**Q：為什麼要用 ? 當佔位符而不是字串拼接？**
 → 防止 SQL Injection 攻擊，確保安全性。
 
 **Q：什麼時候需要用 Transaction？**
@@ -2115,22 +1895,10 @@ conn.close()
 
 ---
 
-## 單元 8：非關聯式資料（JSON / TinyDB）
-
-### 單元重點
-
-本單元學習 NoSQL（非關聯式資料庫）的概念和應用：
-
-- **NoSQL 思維**：理解文件式資料庫的特點和適用場景
-- **JSON 資料操作**：使用 JSON 作為簡單資料庫，儲存和查詢資料
-- **TinyDB 基礎**：輕量級 NoSQL 資料庫的使用
-- **TinyDB 查詢**：使用 Query 物件進行複雜條件查詢
-- **文件設計**：如何設計適合 NoSQL 的資料結構
-- **NoSQL vs SQL**：理解何時選擇 NoSQL，何時選擇 SQL
+## 單元 7：非關聯式資料（JSON / TinyDB）
 
 ### 為什麼要學 NoSQL？
 
-**生活情境：**
 想像你在管理「筆記本 App」，每篇筆記的內容都不一樣：
 
 - 有些筆記只有純文字
@@ -2138,13 +1906,13 @@ conn.close()
 - 有些筆記有清單、待辦事項
 - 結構很「彈性」，不固定
 
-**用 SQL？**
+**如果用 SQL？**
 
 - 需要事先定義欄位：標題、內容、標籤 1、標籤 2、標籤 3...
 - 如果某篇筆記有 10 個標籤怎麼辦？欄位不夠用！
 - 每次改資料結構都要「ALTER TABLE」，很麻煩
 
-**用 NoSQL？**
+**如果用 NoSQL？**
 
 - 每篇筆記就是一個「文件（document）」
 - 想加什麼欄位就加，非常彈性
@@ -2158,7 +1926,7 @@ conn.close()
 - ❌ **不適合複雜關聯**：多表 JOIN 查詢不如 SQL 方便
 - ❌ **不適合交易處理**：缺乏 SQL 的 ACID 特性
 
-### 生活化範例：手機記事本
+### 生活範例：手機記事本
 
 **情境：**
 你的手機記事本就是典型的 NoSQL 應用！
@@ -2199,122 +1967,21 @@ note3 = {
 - `note3` 有附件，其他沒有
 - 這就是 NoSQL 的「彈性」！
 
+### 什麼情況用 SQL / 什麼情況用 NoSQL?
+
+#### 比較適合 SQL 的情境：
+
+需要強一致性、交易（轉帳、下單）、多表關聯、複雜查詢（多條件、JOIN、子查詢）。
+
+#### 比較適合 NoSQL 的情境：
+
+需要超大量資料、超多使用者、資料結構常變、讀寫頻率很高但查詢邏輯相對簡單，例如：貼文牆、快取、session、log 搜集。
+
 ### 程式範例
 
-#### 範例 1：使用 JSON 作為簡單資料庫
+#### 範例 1：使用 TinyDB 資料庫
 
-**目標：** 學習如何使用 JSON 檔案來儲存和管理資料，實現類似資料庫的基本功能。
-
-**情境：** 管理個人聯絡人資料。
-
-```python
-import json
-import os
-from datetime import datetime
-
-
-class ContactManager:
-    """聯絡人管理系統"""
-
-    def __init__(self, filename='contacts.json'):
-        self.filename = filename
-        self.contacts = self.load_contacts()
-
-    def load_contacts(self):
-        """載入聯絡人資料"""
-        if os.path.exists(self.filename):
-            try:
-                with open(self.filename, 'r', encoding='utf-8') as f:
-                    return json.load(f)
-            except json.JSONDecodeError:
-                return []
-        return []
-
-    def save_contacts(self):
-        """儲存聯絡人資料"""
-        with open(self.filename, 'w', encoding='utf-8') as f:
-            json.dump(self.contacts, f, ensure_ascii=False, indent=2)
-
-    def add_contact(self, name, phone, email=''):
-        """新增聯絡人"""
-        contact = {
-            'id': self.generate_id(),
-            'name': name,
-            'phone': phone,
-            'email': email,
-            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-
-        self.contacts.append(contact)
-        self.save_contacts()
-        print(f"✓ 已新增聯絡人：{name}")
-
-    def generate_id(self):
-        """生成唯一 ID"""
-        if not self.contacts:
-            return 1
-        return max(c['id'] for c in self.contacts) + 1
-
-    def find_by_name(self, name):
-        """依姓名查詢聯絡人"""
-        results = [c for c in self.contacts if name.lower() in c['name'].lower()]
-        return results
-
-    def update_contact(self, contact_id, name=None, phone=None, email=None):
-        """更新聯絡人資料"""
-        contact = self.find_by_id(contact_id)
-
-        if not contact:
-            print(f"✗ 找不到 ID 為 {contact_id} 的聯絡人")
-            return False
-
-        if name:
-            contact['name'] = name
-        if phone:
-            contact['phone'] = phone
-        if email is not None:
-            contact['email'] = email
-
-        self.save_contacts()
-        print(f"✓ 已更新聯絡人 ID {contact_id}")
-
-    def delete_contact(self, contact_id):
-        """刪除聯絡人"""
-        contact = self.find_by_id(contact_id)
-
-        if not contact:
-            print(f"✗ 找不到 ID 為 {contact_id} 的聯絡人")
-            return False
-
-        self.contacts.remove(contact)
-        self.save_contacts()
-        print(f"✓ 已刪除聯絡人：{contact['name']}")
-
-
-# 使用範例
-manager = ContactManager()
-manager.add_contact("王小明", "0912-345-678", "ming@example.com")
-manager.add_contact("李小華", "0923-456-789", "hua@example.com")
-
-# 查詢
-results = manager.find_by_name("小")
-for contact in results:
-    print(f"{contact['name']}: {contact['phone']}")
-
-# 更新
-manager.update_contact(1, phone="0911-111-111")
-
-# 刪除
-manager.delete_contact(2)
-```
-
-**範例檔案：** `python_advanced/unit08_nosql_data/example01_json_database.py`
-
-#### 範例 2：TinyDB 基本操作
-
-**目標：** 介紹 TinyDB 這個輕量級的 NoSQL 資料庫，學習基本的 CRUD 操作。
-
-**情境：** 管理圖書館的藏書資料。
+TinyDB 是一個「用 JSON 檔當底層儲存的、輕量級 Python NoSQL 文件資料庫」，專門給小型專案用
 
 **安裝 TinyDB：**
 
@@ -2387,13 +2054,9 @@ print("✓ 已刪除書籍")
 db.close()
 ```
 
-**範例檔案：** `python_advanced/unit08_nosql_data/example02_tinydb_basic.py`
+**範例檔案：** `unit07_nosql_data/example01_tinydb_basic.py`
 
-#### 範例 3：TinyDB 進階查詢
-
-**目標：** 學習 TinyDB 的進階查詢功能，包含複雜條件、自訂函數等。
-
-**情境：** 管理電影資料庫，進行各種複雜查詢。
+#### 範例 2：TinyDB 進階查詢電影資料庫
 
 ```python
 from tinydb import TinyDB, Query, where
@@ -2472,25 +2135,11 @@ print(f"\n平均評分: {avg_rating:.2f}")
 db.close()
 ```
 
-**範例檔案：** `python_advanced/unit08_nosql_data/example03_tinydb_query.py`
+**範例檔案：** `unit07_nosql_data/example02_tinydb_query.py`
 
 ### 練習題
 
-#### 練習 1：JSON 筆記本 ⭐⭐
-
-**任務：** 使用 JSON 建立一個簡單的筆記本系統。
-
-**要求：**
-
-1. 實作 `NotesManager` 類別
-2. 支援新增、查詢、更新、刪除筆記
-3. 每則筆記包含：標題、內容、標籤、建立時間、更新時間
-4. 支援依標籤篩選筆記
-5. 資料存入 `notes.json` 檔案
-
-**練習檔案：** `python_advanced/unit08_nosql_data/exercise01_json_notes.py`
-
-#### 練習 2：TinyDB 待辦事項 ⭐⭐⭐
+#### 練習：使用 TinyDB 建立待辦事項
 
 **任務：** 使用 TinyDB 建立待辦事項管理系統。
 
@@ -2508,9 +2157,9 @@ db.close()
    - 標記為完成
    - 刪除待辦事項
 
-**練習檔案：** `python_advanced/unit08_nosql_data/exercise02_tinydb_todo.py`
+**練習檔案：** `unit07_nosql_data/exercise01_tinydb_todo.py`
 
-### 重點觀念整理
+### 常見問題
 
 **Q：NoSQL 和 SQL 有什麼差別？**
 → SQL 是「關聯式」（表格結構、固定欄位），NoSQL 是「文件式」（彈性結構、類似 JSON）。
@@ -2541,8 +2190,8 @@ db.close()
 
 ### SQL vs NoSQL 選擇指南
 
-| 特性         | SQL（關聯式）      | NoSQL（文件式）    |
-| ------------ | ------------------ | ------------------ |
+| 特性               | SQL（關聯式）      | NoSQL（文件式）    |
+| ------------------ | ------------------ | ------------------ |
 | **資料結構** | 固定欄位、表格式   | 彈性、類似 JSON    |
 | **查詢能力** | 強大（JOIN、統計） | 基礎查詢           |
 | **交易處理** | 支援 ACID          | 通常不支援         |
