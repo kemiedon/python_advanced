@@ -5,9 +5,12 @@
 
 
 def require_login(func):
-    def wrapper(user):
+    def wrapper(user, password):
         if not user:
-            print("❌ 請先登入")
+            print("❌ 請先輸入帳號")
+            return
+        if password != "123456":
+            print("❌ 密碼錯誤，請重新輸入")
             return
         print("✓ 已驗證身份，開始執行")
         func(user)
@@ -21,5 +24,7 @@ def access_system(user):
 
 
 if __name__ == "__main__":
-    access_system("小明")  # ✓ 已驗證身份，開始執行 / 歡迎 小明，進入系統
-    access_system(None)  # ❌ 請先登入
+    # 示範互動式登入
+    user = input("請輸入帳號：")
+    password = input("請輸入密碼：")
+    access_system(user, password)

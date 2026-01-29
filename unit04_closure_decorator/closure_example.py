@@ -1,26 +1,24 @@
 """closure_example.py
 
-示範：專屬筆記本（閉包）
+示範：倍數產生器（閉包）
 """
 
 
-def make_counter(name):
-    count = 0  # 外層變數
+def make_multiplier(factor):
+    """
+    這是一個外層函式，用來建立倍數產生器。
+    """
+    def multiplier(number):
+        # multiplier 記住了 factor 這個來自外部作用域的變數
+        return number * factor
+    
+    return multiplier
 
-    def add_one():
-        nonlocal count
-        count += 1
-        print(f"{name} 的計數：{count}")
+# 建立一個專門「翻 3 倍」的函式
+triple_it = make_multiplier(3)
 
-    return add_one
+# 建立一個專門「翻 10 倍」的函式
+deca_it = make_multiplier(10)
 
-
-if __name__ == "__main__":
-    # 每位學生有自己的計數器
-    小明計數 = make_counter("小明")
-    小美計數 = make_counter("小美")
-
-    小明計數()  # 輸出：小明 的計數：1
-    小明計數()  # 輸出：小明 的計數：2
-    小美計數()  # 輸出：小美 的計數：1
-    小美計數()  # 輸出：小美 的計數：2
+print(triple_it(5))  # 輸出 15
+print(deca_it(5))    # 輸出 50
