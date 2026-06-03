@@ -144,43 +144,34 @@ def main():
     print("圖書館借閱系統")
     print("=" * 60)
 
-    # 建立系統
     library = LibrarySystem()
 
-    # 新增書籍
     print("\n【新增書籍】")
     library.add_book("978-1234567890", "Python 程式設計", "王小明", "程式設計", 5)
     library.add_book("978-2345678901", "資料科學入門", "李小華", "資料科學", 3)
     library.add_book("978-3456789012", "SQL 資料庫", "張大同", "資料庫", 4)
 
-    # 新增會員
     print("\n【新增會員】")
     library.add_member("M001", "陳小美", "0912-345-678")
     library.add_member("M002", "林大強", "0923-456-789")
 
-    # 借書
     print("\n【借書】")
     library.borrow_book("M001", "978-1234567890")
     library.borrow_book("M001", "978-2345678901")
     library.borrow_book("M002", "978-1234567890")
 
-    # 查詢可借書籍
     print("\n【可借閱書籍】")
     library.get_available_books()
 
-    # 查詢會員借閱記錄
     print("\n【陳小美的借閱記錄】")
     library.get_member_borrowings("M001")
 
-    # 還書
     print("\n【還書】")
     library.return_book(1)
 
-    # 查詢逾期書籍
     print("\n【逾期書籍】")
     library.find_overdue_books()
 
-    # 熱門書籍
     print("\n【熱門書籍】")
     library.get_popular_books()
 

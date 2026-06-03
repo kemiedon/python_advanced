@@ -133,22 +133,18 @@ def main():
     print("成績統計系統")
     print("=" * 60)
 
-    # 建立管理系統
     manager = GradeManager()
 
-    # 新增學生
     print("\n【新增學生】")
     manager.add_student("S001", "王小明", "一年A班")
     manager.add_student("S002", "李小華", "一年A班")
     manager.add_student("S003", "張大同", "一年B班")
 
-    # 新增科目
     print("\n【新增科目】")
     manager.add_subject("MATH", "數學")
     manager.add_subject("ENG", "英文")
     manager.add_subject("PHY", "物理")
 
-    # 新增成績
     print("\n【新增成績】")
     manager.add_score("S001", "MATH", 85)
     manager.add_score("S001", "ENG", 78)
@@ -160,25 +156,20 @@ def main():
     manager.add_score("S003", "ENG", 82)
     manager.add_score("S003", "PHY", 58)
 
-    # 查詢學生成績
     print("\n【王小明的成績】")
     manager.get_student_scores("S001")
 
-    # 計算平均
     print("\n【平均成績】")
     avg = manager.calculate_student_average("S001")
     print(f"王小明的平均成績: {avg:.2f}")
 
-    # 科目平均
     print("\n【數學科平均】")
     avg = manager.calculate_subject_average("MATH")
     print(f"數學平均分數: {avg:.2f}")
 
-    # 最高分
     print("\n【各科最高分】")
     manager.find_top_students_by_subject()
 
-    # 不及格
     print("\n【不及格記錄】")
     manager.find_failing_scores()
 

@@ -1,5 +1,5 @@
 """
-練習 2：TinyDB 待辦事項 ⭐⭐⭐
+練習 1：TinyDB 待辦事項 ⭐⭐⭐
 
 任務：
 使用 TinyDB 建立待辦事項管理系統。
@@ -130,40 +130,32 @@ def main():
     print("TinyDB 待辦事項管理")
     print("=" * 60)
 
-    # 建立管理器
     manager = TodoManager()
 
-    # 測試新增
     print("\n【新增待辦事項】")
     manager.add_todo("完成 Python 作業", "單元 8 練習", "高")
     manager.add_todo("買菜", "晚餐食材", "中")
     manager.add_todo("運動", "跑步 30 分鐘", "中")
     manager.add_todo("看書", "閱讀技術書籍", "低")
 
-    # 顯示所有
     print("\n【所有待辦事項】")
     todos = manager.get_all_todos()
     manager.display_todos(todos)
 
-    # 依狀態查詢
     print("\n【狀態為「待辦」的事項】")
     todos = manager.get_by_status("待辦")
     manager.display_todos(todos)
 
-    # 依優先順序查詢
     print("\n【高優先順序的事項】")
     todos = manager.get_by_priority("高")
     manager.display_todos(todos)
 
-    # 更新狀態
     print("\n【更新狀態】")
     manager.update_status(1, "進行中")
 
-    # 標記完成
     print("\n【標記完成】")
     manager.mark_completed(2)
 
-    # 顯示更新後的資料
     print("\n【更新後的待辦事項】")
     todos = manager.get_all_todos()
     manager.display_todos(todos)
