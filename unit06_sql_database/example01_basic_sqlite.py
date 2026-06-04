@@ -4,7 +4,6 @@
 """
 
 import sqlite3
-import os
 
 
 def demo_create_database():
@@ -27,14 +26,18 @@ def demo_create_table():
     conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
-    # 建立學生資料表
+    # 建立學生資料表（統一 schema，供所有範例共用）
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS students (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id TEXT UNIQUE,
             name TEXT NOT NULL,
             age INTEGER,
-            grade TEXT
+            grade TEXT,
+            score INTEGER,
+            email TEXT,
+            class_id INTEGER
         )
     """
     )
@@ -91,8 +94,8 @@ def demo_query_data():
     conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
-    # 查詢所有資料
-    cursor.execute("SELECT * FROM students")
+    # 查詢所有資料（明確指定欄位）
+    cursor.execute("SELECT id, name, age, grade FROM students")
     rows = cursor.fetchall()
 
     print(f"查詢到 {len(rows)} 筆資料：")
@@ -112,7 +115,7 @@ def demo_query_with_condition():
     # 查詢三年級的學生
     cursor.execute(
         """
-        SELECT * FROM students
+        SELECT id, name, age, grade FROM students
         WHERE grade = ?
     """,
         ("三年級",),
@@ -199,10 +202,14 @@ def demo_drop_table():
 
 
 if __name__ == "__main__":
-    # 清除舊的資料庫檔案（重新開始）
-    if os.path.exists("students.db"):
-        os.remove("students.db")
-        print("已刪除舊的資料庫檔案\n")
+    # 清除舊的 students 資料表（重新開始，保留其他資料表）
+    conn = sqlite3.connect("students.db")
+    cursor = conn.cursor()
+    cursor.execute("DROP TABLE IF EXISTS students")
+    cursor.execute("DROP TABLE IF EXISTS temp_table")
+    conn.commit()
+    conn.close()
+    print("已清除舊的 students 資料表\n")
 
     demo_create_database()
     demo_create_table()

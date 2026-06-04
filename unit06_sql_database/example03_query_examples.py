@@ -8,18 +8,21 @@ import sqlite3
 
 def setup_database():
     """建立測試資料庫"""
-    conn = sqlite3.connect("query_demo.db")
+    conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
-    # 建立資料表
+    # 建立資料表（統一 schema，供所有範例共用）
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS students (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id TEXT UNIQUE,
             name TEXT NOT NULL,
             age INTEGER,
             grade TEXT,
-            score INTEGER
+            score INTEGER,
+            email TEXT,
+            class_id INTEGER
         )
     """
     )
@@ -56,10 +59,10 @@ def demo_select_all():
     """示範查詢所有資料"""
     print("\n=== 查詢所有學生 ===")
 
-    conn = sqlite3.connect("query_demo.db")
+    conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM students")
+    cursor.execute("SELECT id, name, age, grade, score FROM students")
     rows = cursor.fetchall()
 
     for row in rows:
@@ -72,7 +75,7 @@ def demo_select_columns():
     """示範查詢特定欄位"""
     print("\n=== 查詢特定欄位 ===")
 
-    conn = sqlite3.connect("query_demo.db")
+    conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
     cursor.execute("SELECT name, score FROM students")
@@ -89,7 +92,7 @@ def demo_where_clause():
     """示範 WHERE 條件查詢"""
     print("\n=== WHERE 條件查詢 ===")
 
-    conn = sqlite3.connect("query_demo.db")
+    conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
     # 查詢成績大於 85 的學生
@@ -113,7 +116,7 @@ def demo_order_by():
     """示範排序查詢"""
     print("\n=== ORDER BY 排序 ===")
 
-    conn = sqlite3.connect("query_demo.db")
+    conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
     # 依成績由高到低排序
@@ -137,7 +140,7 @@ def demo_limit():
     """示範 LIMIT 限制筆數"""
     print("\n=== LIMIT 限制筆數 ===")
 
-    conn = sqlite3.connect("query_demo.db")
+    conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
     # 查詢前 3 名
@@ -162,7 +165,7 @@ def demo_aggregate_functions():
     """示範聚合函數"""
     print("\n=== 聚合函數（統計）===")
 
-    conn = sqlite3.connect("query_demo.db")
+    conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
     # 計算各種統計數據
@@ -192,7 +195,7 @@ def demo_group_by():
     """示範 GROUP BY 分組"""
     print("\n=== GROUP BY 分組統計 ===")
 
-    conn = sqlite3.connect("query_demo.db")
+    conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
     # 依年級分組統計
@@ -220,7 +223,7 @@ def demo_having():
     """示範 HAVING 條件"""
     print("\n=== HAVING 分組後篩選 ===")
 
-    conn = sqlite3.connect("query_demo.db")
+    conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
     # 查詢平均分數大於 85 的年級
@@ -247,7 +250,7 @@ def demo_like_pattern():
     """示範 LIKE 模糊查詢"""
     print("\n=== LIKE 模糊查詢 ===")
 
-    conn = sqlite3.connect("query_demo.db")
+    conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
     # 查詢名字中包含「小」的學生
@@ -272,7 +275,7 @@ def demo_in_operator():
     """示範 IN 運算子"""
     print("\n=== IN 運算子 ===")
 
-    conn = sqlite3.connect("query_demo.db")
+    conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
     # 查詢二年級或三年級的學生

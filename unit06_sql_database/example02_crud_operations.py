@@ -35,7 +35,10 @@ class StudentDatabase:
                 student_id TEXT UNIQUE NOT NULL,
                 name TEXT NOT NULL,
                 age INTEGER,
-                email TEXT
+                grade TEXT,
+                score INTEGER,
+                email TEXT,
+                class_id INTEGER
             )
         """
         )
@@ -61,14 +64,16 @@ class StudentDatabase:
 
     def read_all(self):
         """查詢所有學生（Read）"""
-        self.cursor.execute("SELECT * FROM students")
+        self.cursor.execute(
+            "SELECT id, student_id, name, age, email FROM students"
+        )
         return self.cursor.fetchall()
 
     def read_by_id(self, student_id):
         """根據學號查詢學生（Read）"""
         self.cursor.execute(
             """
-            SELECT * FROM students
+            SELECT id, student_id, name, age, email FROM students
             WHERE student_id = ?
         """,
             (student_id,),
@@ -134,8 +139,8 @@ class StudentDatabase:
 
         for student in students:
             print(
-                f"{student[0]:<5} {student[1]:<10} {student[2]:<10} "
-                f"{student[3]:<6} {student[4]:<25}"
+                f"{student[0]:<5} {student[1] or '':<10} {student[2] or '':<10} "
+                f"{student[3] or '':<6} {student[4] or '':<25}"
             )
 
 
@@ -143,9 +148,13 @@ def demo_crud():
     """示範完整的 CRUD 操作"""
 
     # 建立資料庫實例
-    db = StudentDatabase("crud_demo.db")
+    db = StudentDatabase("students.db")
     db.connect()
     db.create_table()
+
+    # 清除舊資料，確保 CRUD 示範從空白開始
+    db.cursor.execute("DELETE FROM students WHERE student_id IS NOT NULL")
+    db.conn.commit()
 
     print("\n=== CREATE（新增）===")
     db.create("S001", "小明", 20, "ming@example.com")
