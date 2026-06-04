@@ -26,7 +26,7 @@ def demo_create_table():
     conn = sqlite3.connect("students.db")
     cursor = conn.cursor()
 
-    # 建立學生資料表（統一 schema，供所有範例共用）
+    # 建立學生資料表
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS students (
